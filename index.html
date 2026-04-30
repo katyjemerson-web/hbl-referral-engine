@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>HBL Referral Engine</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Raleway:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --blue:        #4A90C4;
+    --blue-dark:   #3A7AAE;
+    --blue-deep:   #2C6090;
+    --blue-soft:   #EBF4FB;
+    --blue-mid:    #A8CFEA;
+    --blue-light:  #D6EAFA;
+    --cream:       #F7F9FC;
+    --text:        #1E2D3D;
+    --text-muted:  #6B8296;
+    --text-light:  #A0B4C4;
+    --border:      #D8E6F0;
+    --white:       #FFFFFF;
+    --card-bg:     #FDFEFF;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Raleway', sans-serif; background: var(--cream); color: var(--text); min-height: 100vh; }
+
+  header { background: var(--blue); padding: 2.5rem 2rem 2.2rem; position: relative; overflow: hidden; text-align: center; }
+  header::before { content:''; position:absolute; top:-100px; right:-80px; width:320px; height:320px; border-radius:50%; background:rgba(255,255,255,0.05); pointer-events:none; }
+  header::after  { content:''; position:absolute; bottom:-60px; left:-40px; width:220px; height:220px; border-radius:50%; background:rgba(255,255,255,0.04); pointer-events:none; }
+  .header-inner { max-width: 900px; margin: 0 auto; position: relative; z-index: 1; }
+  .header-eyebrow { display: flex; align-items: center; justify-content: center; gap: 12px; margin-bottom: 0.75rem; }
+  .header-line { width: 32px; height: 1px; background: rgba(255,255,255,0.4); }
+  .header-program { font-size: 11px; font-weight: 500; letter-spacing: 0.18em; text-transform: uppercase; color: rgba(255,255,255,0.75); }
+  header h1 { font-family: 'Cormorant Garamond', serif; font-size: clamp(2rem, 5vw, 3rem); font-weight: 500; color: var(--white); letter-spacing: 0.02em; margin-bottom: 0.4rem; }
+  header p { font-size: 13px; color: rgba(255,255,255,0.6); font-weight: 300; letter-spacing: 0.04em; }
+
+  .stats-bar { background: var(--blue-dark); padding: 0.85rem 2rem; border-bottom: 1px solid rgba(255,255,255,0.1); }
+  .stats-inner { max-width: 900px; margin: 0 auto; display: flex; gap: 2rem; align-items: center; justify-content: center; }
+  .stat { display: flex; align-items: baseline; gap: 7px; }
+  .stat-num { font-family: 'Cormorant Garamond', serif; font-size: 26px; font-weight: 500; color: var(--white); }
+  .stat-label { font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: rgba(255,255,255,0.5); }
+  .stat-divider { width: 1px; height: 18px; background: rgba(255,255,255,0.18); }
+
+  .controls { max-width: 900px; margin: 0 auto; padding: 1.5rem 2rem 0; }
+  .search-wrap { position: relative; margin-bottom: 1rem; }
+  .search-icon { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--text-muted); pointer-events: none; }
+  #search { width: 100%; padding: 12px 16px 12px 42px; border: 1.5px solid var(--border); border-radius: 8px; background: var(--white); font-family: 'Raleway', sans-serif; font-size: 14px; font-weight: 300; color: var(--text); outline: none; transition: border-color 0.2s; }
+  #search:focus { border-color: var(--blue); }
+  #search::placeholder { color: var(--text-light); }
+
+  .filters { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; padding-bottom: 1.5rem; border-bottom: 1px solid var(--border); }
+  .filter-label { font-size: 10px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-muted); margin-right: 4px; }
+  .chip { font-family: 'Raleway', sans-serif; font-size: 12px; font-weight: 400; padding: 5px 14px; border-radius: 20px; border: 1.5px solid var(--border); background: var(--white); color: var(--text-muted); cursor: pointer; transition: all 0.15s; }
+  .chip:hover { border-color: var(--blue-mid); color: var(--blue-dark); }
+  .chip.active { background: var(--blue-soft); border-color: var(--blue); color: var(--blue-deep); font-weight: 500; }
+
+  .grid-wrap { max-width: 900px; margin: 0 auto; padding: 1.5rem 2rem 3rem; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(245px, 1fr)); gap: 16px; }
+
+  .card { background: var(--card-bg); border: 1.5px solid var(--border); border-radius: 12px; padding: 1.25rem; cursor: pointer; transition: border-color 0.2s, transform 0.15s, box-shadow 0.2s; display: flex; flex-direction: column; }
+  .card:hover { border-color: var(--blue); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(74,144,196,0.12); }
+  .card-avatar { width: 52px; height: 52px; border-radius: 50%; overflow: hidden; margin-bottom: 12px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-family: 'Cormorant Garamond', serif; font-size: 19px; font-weight: 500; }
+  .card-avatar img { width: 100%; height: 100%; object-fit: cover; }
+  .card-name { font-family: 'Cormorant Garamond', serif; font-size: 17px; font-weight: 500; color: var(--text); margin-bottom: 2px; }
+  .card-biz { font-size: 12px; color: var(--text-muted); margin-bottom: 10px; font-weight: 300; }
+  .card-tag { display: inline-block; font-size: 10px; padding: 3px 10px; border-radius: 20px; background: var(--blue-soft); color: var(--blue-deep); margin-bottom: 10px; font-weight: 600; letter-spacing: 0.04em; }
+  .card-services { font-size: 12px; color: var(--text-muted); line-height: 1.6; margin-bottom: 14px; flex: 1; font-weight: 300; }
+  .card-cta { font-size: 12px; color: var(--blue); font-weight: 500; display: flex; align-items: center; gap: 4px; }
+  .card-cta svg { transition: transform 0.15s; }
+  .card:hover .card-cta svg { transform: translateX(3px); }
+
+  .state-msg { grid-column: 1/-1; padding: 3rem; text-align: center; color: var(--text-muted); font-size: 14px; font-weight: 300; }
+
+  .modal-backdrop { display: none; position: fixed; inset: 0; background: rgba(28,45,61,0.45); backdrop-filter: blur(3px); z-index: 200; align-items: center; justify-content: center; padding: 1rem; }
+  .modal-backdrop.open { display: flex; }
+  .modal { background: var(--white); border-radius: 16px; border: 1.5px solid var(--border); width: 100%; max-width: 520px; max-height: 90vh; overflow-y: auto; position: relative; animation: slideUp 0.2s ease; }
+  @keyframes slideUp { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:translateY(0); } }
+  .modal-header { background: var(--blue); border-radius: 14px 14px 0 0; padding: 1.5rem 1.5rem 1.25rem; position: relative; display: flex; align-items: center; gap: 16px; }
+  .modal-close { position: absolute; top: 1rem; right: 1rem; width: 30px; height: 30px; border-radius: 50%; background: rgba(255,255,255,0.15); border: none; color: rgba(255,255,255,0.8); cursor: pointer; font-size: 15px; display: flex; align-items: center; justify-content: center; transition: background 0.15s; }
+  .modal-close:hover { background: rgba(255,255,255,0.25); }
+  .modal-avatar { width: 64px; height: 64px; border-radius: 50%; overflow: hidden; flex-shrink: 0; border: 2px solid rgba(255,255,255,0.3); display: flex; align-items: center; justify-content: center; font-family: 'Cormorant Garamond', serif; font-size: 22px; }
+  .modal-avatar img { width: 100%; height: 100%; object-fit: cover; }
+  .modal-name { font-family: 'Cormorant Garamond', serif; font-size: 21px; font-weight: 500; color: var(--white); margin-bottom: 2px; }
+  .modal-biz { font-size: 13px; color: rgba(255,255,255,0.65); font-weight: 300; margin-bottom: 8px; }
+  .modal-tag { display: inline-block; font-size: 10px; padding: 3px 10px; border-radius: 20px; background: rgba(255,255,255,0.18); color: var(--white); font-weight: 600; letter-spacing: 0.05em; }
+  .modal-body { padding: 1.5rem; }
+  .modal-section { margin-bottom: 1.25rem; }
+  .modal-section-label { font-size: 10px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 8px; }
+  .mission-block { background: var(--blue-soft); border-left: 3px solid var(--blue); border-radius: 0 8px 8px 0; padding: 12px 16px; font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 15px; line-height: 1.65; color: var(--blue-deep); }
+  .modal-text { font-size: 13px; color: var(--text-muted); line-height: 1.6; font-weight: 300; }
+  hr.modal-divider { border: none; border-top: 1px solid var(--border); margin: 1.25rem 0; }
+  .contact-grid { display: flex; flex-direction: column; gap: 8px; }
+  .contact-row { display: flex; align-items: center; gap: 10px; }
+  .contact-key { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); width: 52px; flex-shrink: 0; }
+  .contact-val { font-size: 13px; color: var(--text); }
+  .contact-val a { color: var(--blue); text-decoration: none; }
+  .contact-val a:hover { text-decoration: underline; }
+  .visit-btn { display: inline-flex; align-items: center; gap: 8px; margin-top: 1.25rem; padding: 10px 20px; background: var(--blue); color: var(--white); border-radius: 6px; font-family: 'Raleway', sans-serif; font-size: 13px; font-weight: 600; letter-spacing: 0.05em; text-decoration: none; transition: background 0.15s; }
+  .visit-btn:hover { background: var(--blue-dark); }
+
+  .av-0 { background:#EBF4FB; color:#2C6090; }
+  .av-1 { background:#E1F5EE; color:#0F6E56; }
+  .av-2 { background:#EEEDFE; color:#3C3489; }
+  .av-3 { background:#FAEEDA; color:#854F0B; }
+  .av-4 { background:#FBEAF0; color:#72243E; }
+  .av-5 { background:#D6EAFA; color:#1E5A8A; }
+  .av-6 { background:#EAF3DE; color:#3B6D11; }
+  .av-7 { background:#FCEBEB; color:#A32D2D; }
+
+  @media (max-width: 600px) {
+    header, .stats-bar, .controls, .grid-wrap { padding-left: 1rem; padding-right: 1rem; }
+    .stats-inner { gap: 1.25rem; }
+    .grid { grid-template-columns: 1fr 1fr; gap: 10px; }
+  }
+  @media (max-width: 400px) { .grid { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div class="header-eyebrow">
+      <div class="header-line"></div>
+      <span class="header-program">Her Big Leap Program</span>
+      <div class="header-line"></div>
+    </div>
+    <h1>HBL Referral Engine</h1>
+    <p>Find and refer the brilliant women in our program</p>
+  </div>
+</header>
+
+<div class="stats-bar">
+  <div class="stats-inner">
+    <div class="stat"><span class="stat-num" id="stat-members">6</span><span class="stat-label">members</span></div>
+    <div class="stat-divider"></div>
+    <div class="stat"><span class="stat-num" id="stat-industries">5</span><span class="stat-label">industries</span></div>
+    <div class="stat-divider"></div>
+    <div class="stat"><span class="stat-num" id="stat-showing">6</span><span class="stat-label">showing</span></div>
+  </div>
+</div>
+
+<div class="controls">
+  <div class="search-wrap">
+    <svg class="search-icon" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6">
+      <circle cx="6.5" cy="6.5" r="4.5"/><line x1="10.5" y1="10.5" x2="14" y2="14"/>
+    </svg>
+    <input type="text" id="search" placeholder="Search by name, business, or service…" oninput="applyFilters()"/>
+  </div>
+  <div class="filters" id="filters">
+    <span class="filter-label">Industry:</span>
+    <span class="chip active" onclick="setIndustry(this,'all')">All</span>
+    <span class="chip" onclick="setIndustry(this,'Design')">Design</span>
+    <span class="chip" onclick="setIndustry(this,'Finance')">Finance</span>
+    <span class="chip" onclick="setIndustry(this,'Legal')">Legal</span>
+    <span class="chip" onclick="setIndustry(this,'Marketing')">Marketing</span>
+    <span class="chip" onclick="setIndustry(this,'Wellness')">Wellness</span>
+  </div>
+</div>
+
+<div class="grid-wrap">
+  <div class="grid" id="grid"></div>
+</div>
+
+<div class="modal-backdrop" id="backdrop" onclick="closeModal(event)">
+  <div class="modal">
+    <div class="modal-header">
+      <button class="modal-close" onclick="closeOverlay()">✕</button>
+      <div class="modal-avatar" id="modal-avatar"></div>
+      <div>
+        <div class="modal-name" id="modal-name"></div>
+        <div class="modal-biz" id="modal-biz"></div>
+        <span class="modal-tag" id="modal-tag"></span>
+      </div>
+    </div>
+    <div class="modal-body" id="modal-body"></div>
+  </div>
+</div>
+
+<script>
+const allMembers = [
+  { name:"Amara Johnson", biz:"Amara & Co. Marketing", industry:"Marketing", services:"Brand strategy, social media, content creation", mission:"We exist to amplify the voices of women-owned businesses through storytelling that converts. Every brand has a story worth telling — we make sure the right people hear it.", location:"Chicago, IL", email:"amara@amaraco.com", phone:"312-555-0182", photo:"https://i.pravatar.cc/150?img=47", website:"https://amaraco.com" },
+  { name:"Tiffany Brooks", biz:"Brooks Wellness Studio", industry:"Wellness", services:"Yoga, mindfulness coaching, corporate wellness programs", mission:"Our mission is to make holistic wellness accessible to every body — no matter your schedule, budget, or experience level. Rest is productive. Joy is the goal.", location:"Oak Park, IL", email:"tiffany@brookswellness.com", phone:"708-555-0247", photo:"https://i.pravatar.cc/150?img=32", website:"https://brookswellness.com" },
+  { name:"Simone Carter", biz:"Carter Financial Group", industry:"Finance", services:"Financial planning, tax prep, small business accounting", mission:"We believe every woman deserves a financial plan that works as hard as she does. We demystify money so our clients can build wealth with clarity and confidence.", location:"Evanston, IL", email:"simone@carterfinancial.com", phone:"847-555-0339", photo:"https://i.pravatar.cc/150?img=25", website:"https://carterfinancial.com" },
+  { name:"Kezia Obi", biz:"Kezia Creative Studio", industry:"Design", services:"Logo design, branding, web design, print", mission:"Great design is not decoration — it is communication. I help small businesses look as professional and powerful as they truly are, from day one.", location:"Chicago, IL", email:"kezia@keziacreative.com", phone:"312-555-0461", photo:"", website:"https://keziacreative.com" },
+  { name:"Priya Nair", biz:"Nair Law Office", industry:"Legal", services:"Business formation, contracts, IP protection", mission:"Entrepreneurs should not have to choose between growing fast and protecting what they have built. I provide practical, plain-English legal guidance so you can do both.", location:"Chicago, IL", email:"priya@nairlaw.com", phone:"312-555-0578", photo:"https://i.pravatar.cc/150?img=29", website:"https://nairlaw.com" },
+  { name:"Dana Williams", biz:"Williams Digital Marketing", industry:"Marketing", services:"SEO, paid ads, email marketing, analytics", mission:"Data without direction is just noise. We turn your numbers into a clear growth strategy — so every dollar you spend online actually works for your business.", location:"Berwyn, IL", email:"dana@williamsdm.com", phone:"708-555-0693", photo:"", website:"https://williamsdm.com" }
+];
+
+let activeIndustry = 'all';
+
+function initials(name) { return name.split(' ').map(p=>p[0]).join('').substring(0,2).toUpperCase(); }
+function avColor(idx) { return `av-${idx % 8}`; }
+
+function avatarHTML(m, idx, type) {
+  const cls = type === 'modal' ? 'modal-avatar' : 'card-avatar';
+  const ac  = avColor(idx);
+  const ini = initials(m.name);
+  if (m.photo) return `<div class="${cls} ${ac}"><img src="${m.photo}" alt="${ini}" onerror="this.parentElement.innerHTML='${ini}';this.parentElement.className='${cls} ${ac}';"/></div>`;
+  return `<div class="${cls} ${ac}">${ini}</div>`;
+}
+
+function renderGrid(list) {
+  const grid = document.getElementById('grid');
+  document.getElementById('stat-showing').textContent = list.length;
+  if (!list.length) { grid.innerHTML = '<div class="state-msg">No members match your search.</div>'; return; }
+  grid.innerHTML = list.map(m => {
+    const idx = allMembers.indexOf(m);
+    return `<div class="card" onclick="openModal(${idx})">
+      ${avatarHTML(m, idx, 'card')}
+      <div class="card-name">${m.name}</div>
+      <div class="card-biz">${m.biz}</div>
+      <span class="card-tag">${m.industry}</span>
+      <div class="card-services">${m.services}</div>
+      <div class="card-cta">Learn more
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M2 6h8M6 2l4 4-4 4"/></svg>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function applyFilters() {
+  const q = document.getElementById('search').value.toLowerCase();
+  let filtered = activeIndustry === 'all' ? allMembers : allMembers.filter(m => m.industry === activeIndustry);
+  if (q) filtered = filtered.filter(m =>
+    m.name.toLowerCase().includes(q) ||
+    m.biz.toLowerCase().includes(q) ||
+    m.services.toLowerCase().includes(q) ||
+    m.mission.toLowerCase().includes(q)
+  );
+  renderGrid(filtered);
+}
+
+function setIndustry(el, industry) {
+  document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active'); activeIndustry = industry; applyFilters();
+}
+
+function openModal(idx) {
+  const m = allMembers[idx];
+  document.getElementById('modal-name').textContent = m.name;
+  document.getElementById('modal-biz').textContent  = m.biz;
+  document.getElementById('modal-tag').textContent  = m.industry;
+  const avEl = document.getElementById('modal-avatar');
+  const ac = avColor(idx); const ini = initials(m.name);
+  avEl.className = `modal-avatar ${ac}`;
+  avEl.innerHTML = m.photo ? `<img src="${m.photo}" alt="${ini}" onerror="this.parentElement.innerHTML='${ini}';this.parentElement.className='modal-avatar ${ac}';"/>` : ini;
+  document.getElementById('modal-body').innerHTML = `
+    ${m.mission ? `<div class="modal-section"><div class="modal-section-label">Mission</div><div class="mission-block">"${m.mission}"</div></div>` : ''}
+    <hr class="modal-divider"/>
+    ${m.services ? `<div class="modal-section"><div class="modal-section-label">Services</div><div class="modal-text">${m.services}</div></div>` : ''}
+    ${m.location ? `<div class="modal-section"><div class="modal-section-label">Location</div><div class="modal-text">${m.location}</div></div>` : ''}
+    <hr class="modal-divider"/>
+    <div class="modal-section"><div class="modal-section-label">Contact</div>
+      <div class="contact-grid">
+        ${m.email ? `<div class="contact-row"><span class="contact-key">Email</span><span class="contact-val"><a href="mailto:${m.email}">${m.email}</a></span></div>` : ''}
+        ${m.phone ? `<div class="contact-row"><span class="contact-key">Phone</span><span class="contact-val">${m.phone}</span></div>` : ''}
+      </div>
+    </div>
+    ${m.website ? `<a class="visit-btn" href="${m.website}" target="_blank" rel="noopener">Visit website ↗</a>` : ''}
+  `;
+  document.getElementById('backdrop').classList.add('open');
+}
+
+function closeOverlay() { document.getElementById('backdrop').classList.remove('open'); }
+function closeModal(e) { if (e.target === document.getElementById('backdrop')) closeOverlay(); }
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeOverlay(); });
+
+renderGrid(allMembers);
+</script>
+</body>
+</html>
